@@ -1,6 +1,6 @@
 use anyhow::Result;
-use clap::Parser;
 use ciprobe::{cli::Cli, cli_handler::handle_cli};
+use clap::Parser;
 
 #[tokio::main]
 async fn main() -> Result<()> {
