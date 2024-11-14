@@ -1,0 +1,14 @@
+task_states:
+  gitversion:
+    - setup_version: '3'
+      execute_version: '3'
+      spec_version: '6.0.3'
+  other_tasks:
+    'UseNode':
+      - '1'
+    'ArchiveFiles':
+      - '1'
+    'CopyFiles':
+      - '1'
+    'Docker':
+      - '1'

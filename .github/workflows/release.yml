@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create Release
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+        run: |
+          gh release create "$tag" \
+              --repo="$GITHUB_REPOSITORY" \
+              --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
+              --generate-notes
+
+  build-release:
+    needs: create-release
+    name: Release for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: ciprobe
+            asset_name: ciprobe-linux-amd64
+          - os: windows-latest
+            artifact_name: ciprobe.exe
+            asset_name: ciprobe-windows-amd64.exe
+          - os: macos-latest
+            artifact_name: ciprobe
+            asset_name: ciprobe-macos-amd64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Rename binary
+        shell: bash
+        run: |
+          cd target/release
+          cp ${{ matrix.artifact_name }} ${{ matrix.asset_name }}
+
+      - name: Upload Release Asset (Windows)
+        if: matrix.os == 'windows-latest'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $asset = "target/release/${{ matrix.asset_name }}"
+          $tag = "${{ github.ref_name }}"
+          gh release upload $tag $asset
+
+      - name: Upload Release Asset (Unix)
+        if: matrix.os != 'windows-latest'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ github.ref_name }} \
+            target/release/${{ matrix.asset_name }}
