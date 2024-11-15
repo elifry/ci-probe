@@ -1,4 +1,4 @@
-# Bastion Labs CI Probe
+# CI Probe
 
 Pipeline standardization tool for CI/CD pipelines written in yml.
 
