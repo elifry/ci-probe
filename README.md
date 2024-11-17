@@ -60,4 +60,4 @@ ci-probe is designed to be extensible. We welcome contributions for:
 
 ## License
 
-MIT License - See LICENSE for details.
+MIT License - See LICENSE for details
