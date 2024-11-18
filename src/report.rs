@@ -152,33 +152,6 @@ fn generate_invalid_states_section(
             .map(|(_, v)| v.as_str())
             .unwrap_or(task_normalized);
 
-        // Get valid versions
-        // let valid_versions = if task_normalized.starts_with("gitversion/") {
-        //     let setup_versions: Vec<_> = config
-        //         .task_states
-        //         .gitversion
-        //         .iter()
-        //         .map(|state| state.setup_version.as_str())
-        //         .collect();
-        //     let execute_versions: Vec<_> = config
-        //         .task_states
-        //         .gitversion
-        //         .iter()
-        //         .map(|state| state.execute_version.as_str())
-        //         .collect();
-        //     if task_normalized == "gitversion/setup" {
-        //         setup_versions
-        //     } else {
-        //         execute_versions
-        //     }
-        // } else {
-        //     config
-        //         .task_states
-        //         .other_tasks
-        //         .get(task_normalized)
-        //         .map(|v| v.iter().map(|s| s.as_str()).collect())
-        //         .unwrap_or_default()
-        // };
         let valid_versions: Vec<_> = config.task_states.get_valid_versions(task_normalized);
 
         md.push_str(&format!(
@@ -252,7 +225,6 @@ fn generate_valid_states_section(
 
     for task in config.get_all_tasks() {
         let task_name = match &task {
-            // SupportedTask::Gitversion => "gitversion",
             SupportedTask::Default(name) => name,
         };
 

@@ -6,8 +6,7 @@ use std::collections::HashMap;
 use std::env;
 use std::path::Path;
 
-#[allow(unused_imports)]
-use crate::{GitVersionState, SupportedTask, TaskValidState};
+use crate::{SupportedTask, TaskValidState};
 
 #[derive(Debug, Clone)]
 pub struct Credentials {
@@ -86,7 +85,6 @@ pub struct Config {
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct TaskStates {
-    // pub gitversion: Vec<GitVersionState>,
     #[serde(default)]
     pub other_tasks: HashMap<String, Vec<String>>,
 }
@@ -118,13 +116,6 @@ impl Config {
 
     pub fn get_valid_states(&self, task: &SupportedTask) -> Vec<TaskValidState> {
         match task {
-            // SupportedTask::Gitversion => self
-            //     .task_states
-            //     .gitversion
-            //     .iter()
-            //     .cloned()
-            //     .map(TaskValidState::Gitversion)
-            //     .collect(),
             SupportedTask::Default(name) => self
                 .task_states
                 .other_tasks
@@ -142,7 +133,6 @@ impl Config {
 
     pub fn get_all_tasks(&self) -> Vec<SupportedTask> {
         let mut tasks = vec![];
-        // let mut tasks = vec![SupportedTask::Gitversion];
         tasks.extend(
             self.task_states
                 .other_tasks
@@ -153,18 +143,6 @@ impl Config {
     }
 
     pub fn is_valid_version(&self, task: &str, version: &str) -> bool {
-        // if task.to_lowercase() == "gitversion" {
-        //     self.task_states
-        //         .gitversion
-        //         .iter()
-        //         .any(|state| version == state.setup_version || version == state.execute_version)
-        // } else {
-        //     self.task_states
-        //         .other_tasks
-        //         .get(task)
-        //         .map(|versions| versions.contains(&version.to_string()))
-        //         .unwrap_or(false)
-        // }
         self.task_states
             .other_tasks
             .get(task)
