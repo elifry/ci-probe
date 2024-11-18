@@ -124,7 +124,7 @@ async fn analyze_single_repo(
         println!("\n📂 Analyzing {}", short_name);
     }
 
-    git_manager.ensure_repo_exists()?;
+    git_manager.clone_or_update()?;
     let pipeline_files = find_pipeline_files(git_manager.get_repo_path(), verbose).await?;
 
     // Add to analyzed repos regardless of whether we find pipeline files

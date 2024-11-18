@@ -213,7 +213,6 @@ fn generate_missing_states_section(md: &mut String, issues: &TaskIssues) -> Resu
     Ok(())
 }
 
-#[allow(clippy::infallible_destructuring_match)]
 fn generate_valid_states_section(
     md: &mut String,
     issues: &TaskIssues,
@@ -224,9 +223,7 @@ fn generate_valid_states_section(
     let mut valid_tasks = Vec::new();
 
     for task in config.get_all_tasks() {
-        let task_name = match &task {
-            SupportedTask::Default(name) => name,
-        };
+        let SupportedTask::Default(task_name) = &task;
 
         if let Some(implementations) = issues.all_implementations.get(task_name) {
             // Only include if all implementations are valid (not in invalid_states)

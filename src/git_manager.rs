@@ -43,23 +43,9 @@ impl GitManager {
         &self.repo_dir
     }
 
-    // Used when --new is not provided
-    pub fn ensure_repo_exists(&self) -> Result<()> {
+    pub fn clone_or_update(&self) -> Result<()> {
         if self.repo_dir.exists() {
             self.update_repo()
-        } else {
-            self.clone_repo()
-        }
-    }
-
-    // Used when --new is provided
-    pub fn ensure_repo_exists_new(&self) -> Result<()> {
-        self.clone_repo()
-    }
-
-    pub fn ensure_repo_exists_no_update(&self) -> Result<()> {
-        if self.repo_dir.exists() {
-            Ok(())
         } else {
             self.clone_repo()
         }

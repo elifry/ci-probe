@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::env;
 use std::path::Path;
 
-use crate::{SupportedTask, TaskValidState};
+use crate::SupportedTask;
 
 #[derive(Debug, Clone)]
 pub struct Credentials {
@@ -113,23 +113,6 @@ impl Config {
         Ok(config)
     }
 
-    pub fn get_valid_states(&self, task: &SupportedTask) -> Vec<TaskValidState> {
-        match task {
-            SupportedTask::Default(name) => self
-                .task_states
-                .other_tasks
-                .get(name)
-                .map(|versions| {
-                    versions
-                        .iter()
-                        .cloned()
-                        .map(TaskValidState::Default)
-                        .collect()
-                })
-                .unwrap_or_default(),
-        }
-    }
-
     pub fn get_all_tasks(&self) -> Vec<SupportedTask> {
         let mut tasks = vec![];
         tasks.extend(
@@ -139,14 +122,6 @@ impl Config {
                 .map(|name| SupportedTask::Default(name.clone())),
         );
         tasks
-    }
-
-    pub fn is_valid_version(&self, task: &str, version: &str) -> bool {
-        self.task_states
-            .other_tasks
-            .get(task)
-            .map(|versions| versions.contains(&version.to_string()))
-            .unwrap_or(false)
     }
 
     fn normalize_task_names(&mut self) {
