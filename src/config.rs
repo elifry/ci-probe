@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use std::env;
 use std::path::Path;
 
+#[allow(unused_imports)]
 use crate::{GitVersionState, SupportedTask, TaskValidState};
 
 #[derive(Debug, Clone)]
@@ -85,7 +86,8 @@ pub struct Config {
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct TaskStates {
-    pub gitversion: Vec<GitVersionState>,
+    // pub gitversion: Vec<GitVersionState>,
+    #[serde(default)]
     pub other_tasks: HashMap<String, Vec<String>>,
 }
 
