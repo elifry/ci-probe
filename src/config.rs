@@ -89,6 +89,15 @@ pub struct TaskStates {
     pub other_tasks: HashMap<String, Vec<String>>,
 }
 
+impl TaskStates {
+    pub fn get_valid_versions(&self, task_name: &str) -> Vec<&str> {
+        self.other_tasks
+            .get(task_name)
+            .map(|v| v.iter().map(|s| s.as_str()).collect())
+            .unwrap_or_default()
+    }
+}
+
 impl Config {
     pub fn load(path: Option<&Path>) -> Result<Self> {
         let path = path.unwrap_or_else(|| Path::new("ciprobeconfig.yml"));

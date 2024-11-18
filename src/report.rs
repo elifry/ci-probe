@@ -179,12 +179,7 @@ fn generate_invalid_states_section(
         //         .map(|v| v.iter().map(|s| s.as_str()).collect())
         //         .unwrap_or_default()
         // };
-        let valid_versions: Vec<_> = config
-            .task_states
-            .other_tasks
-            .get(task_normalized)
-            .map(|v| v.iter().map(|s| s.as_str()).collect())
-            .unwrap_or_default();
+        let valid_versions: Vec<_> = config.task_states.get_valid_versions(task_normalized);
 
         md.push_str(&format!(
             "### 🔧 {} (expected: {})\n\n",
