@@ -41,6 +41,15 @@ impl GitManager {
         })
     }
 
+    fn try_default_branches(repo_dir: &PathBuf) -> Result<String> {
+        for branch in ["develop", "main", "master"] {
+            if Self::try_fetch_branch(repo_dir, branch).is_ok() {
+                return Ok(branch.to_string());
+            }
+        }
+        Err(anyhow::anyhow!("No default branch found"))
+    }
+
     pub fn get_repo_path(&self) -> &PathBuf {
         &self.repo_dir
     }
@@ -103,21 +112,7 @@ impl GitManager {
             return Err(anyhow::anyhow!("Failed to add remote"));
         }
 
-        // Try branches in order: develop, main, master
-        let default_branch = match Self::try_fetch_branch(&self.repo_dir, "develop") {
-            Ok(branch) => branch,
-            Err(_) => match Self::try_fetch_branch(&self.repo_dir, "main") {
-                Ok(branch) => branch,
-                Err(_) => match Self::try_fetch_branch(&self.repo_dir, "master") {
-                    Ok(branch) => branch,
-                    Err(_) => {
-                        return Err(anyhow::anyhow!(
-                            "Failed to fetch repository: no default branch found"
-                        ))
-                    }
-                },
-            },
-        };
+        let default_branch = Self::try_default_branches(&self.repo_dir)?;
 
         // Create and checkout the branch properly
         Command::new("git")
@@ -176,20 +171,8 @@ impl GitManager {
 
         // If we're in detached HEAD state, try branches in order
         if current_branch == "HEAD" {
-            let checkout_result = match Self::try_checkout_branch(&self.repo_dir, "develop") {
-                Ok(_) => Ok(()),
-                Err(_) => match Self::try_checkout_branch(&self.repo_dir, "main") {
-                    Ok(_) => Ok(()),
-                    Err(_) => Self::try_checkout_branch(&self.repo_dir, "master"),
-                },
-            };
-
-            if let Err(e) = checkout_result {
-                return Err(anyhow::anyhow!(
-                    "Failed to checkout any default branch: {}",
-                    e
-                ));
-            }
+            let default_branch = Self::try_default_branches(&self.repo_dir)?;
+            Self::try_checkout_branch(&self.repo_dir, &default_branch)?;
         }
 
         // Ensure sparse checkout is enabled
