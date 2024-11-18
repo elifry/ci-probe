@@ -43,36 +43,6 @@ impl GitManager {
         &self.repo_dir
     }
 
-    pub fn test_connection(&self) -> Result<()> {
-        let repo_name = self
-            .repo_dir
-            .file_name()
-            .and_then(|n| n.to_str())
-            .unwrap_or("unknown");
-
-        println!("Testing Git connection for {}...", repo_name);
-
-        let output = Command::new("git")
-            .arg("ls-remote")
-            .arg("--heads")
-            .arg(&self.repo_url)
-            .output()?;
-
-        if !output.status.success() {
-            let error = String::from_utf8_lossy(&output.stderr);
-            println!("✗ Failed to connect to repository {}", repo_name);
-            println!("Error: {}", error);
-            return Err(anyhow::anyhow!(
-                "Failed to connect to repository {}: {}",
-                repo_name,
-                error
-            ));
-        }
-
-        println!("✓ Successfully connected to repository {}", repo_name);
-        Ok(())
-    }
-
     // Used when --new is not provided
     pub fn ensure_repo_exists(&self) -> Result<()> {
         if self.repo_dir.exists() {

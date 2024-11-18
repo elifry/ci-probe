@@ -1,7 +1,5 @@
 use ciprobe::TaskValidState;
 
-mod utils_tests;
-
 #[test]
 fn test_task_valid_state_serialization() {
     let state = TaskValidState::Default("2".to_string());
