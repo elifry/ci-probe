@@ -32,7 +32,7 @@ pub enum TaskValidState {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SupportedTask {
-    Gitversion,
+    // Gitversion,
     Default(String),
 }
 
@@ -49,7 +49,7 @@ impl std::str::FromStr for SupportedTask {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
-            "gitversion" => Ok(SupportedTask::Gitversion),
+            // "gitversion" => Ok(SupportedTask::Gitversion),
             other => Ok(SupportedTask::Default(other.to_string())),
         }
     }
@@ -58,7 +58,7 @@ impl std::str::FromStr for SupportedTask {
 impl std::fmt::Display for SupportedTask {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            SupportedTask::Gitversion => write!(f, "gitversion"),
+            // SupportedTask::Gitversion => write!(f, "gitversion"),
             SupportedTask::Default(name) => write!(f, "{}", name),
         }
     }
@@ -78,12 +78,12 @@ impl std::fmt::Display for TaskValidState {
 }
 
 impl SupportedTask {
-    pub fn get_all_variants() -> Vec<Self> {
-        vec![
-            Self::Gitversion,
-            // Add any known default tasks here if needed
-        ]
-    }
+    // pub fn get_all_variants() -> Vec<Self> {
+    //     vec![
+    //         Self::Gitversion,
+    //         // Add any known default tasks here if needed
+    //     ]
+    // }
 }
 
 pub fn format_task_states(_task: &SupportedTask, states: Vec<TaskValidState>) -> String {
@@ -99,11 +99,12 @@ pub fn format_task_states(_task: &SupportedTask, states: Vec<TaskValidState>) ->
 }
 
 pub fn parse_task_name(name: &str) -> Result<SupportedTask> {
-    if name.eq_ignore_ascii_case("gitversion") {
-        Ok(SupportedTask::Gitversion)
-    } else {
-        Ok(SupportedTask::Default(name.to_string()))
-    }
+    // if name.eq_ignore_ascii_case("gitversion") {
+    //     Ok(SupportedTask::Gitversion)
+    // } else {
+    //     Ok(SupportedTask::Default(name.to_string()))
+    // }
+    Ok(SupportedTask::Default(name.to_string()))
 }
 
 #[derive(Default)]
@@ -178,25 +179,32 @@ impl TaskIssues {
             });
 
         // Check if task exists in config and validate version
-        let valid_versions = if normalized_task_name.starts_with("gitversion/") {
-            let mut versions = Vec::new();
-            let gitversion_states = &config.task_states.gitversion;
-            for state in gitversion_states {
-                if normalized_task_name == "gitversion/setup" {
-                    versions.push(state.setup_version.clone());
-                } else if normalized_task_name == "gitversion/execute" {
-                    versions.push(state.execute_version.clone());
-                }
-            }
-            versions
-        } else {
-            config
-                .task_states
-                .other_tasks
-                .get(&normalized_task_name)
-                .cloned()
-                .unwrap_or_default()
-        };
+        // let valid_versions = if normalized_task_name.starts_with("gitversion/") {
+        //     let mut versions = Vec::new();
+        //     let gitversion_states = &config.task_states.gitversion;
+        //     for state in gitversion_states {
+        //         if normalized_task_name == "gitversion/setup" {
+        //             versions.push(state.setup_version.clone());
+        //         } else if normalized_task_name == "gitversion/execute" {
+        //             versions.push(state.execute_version.clone());
+        //         }
+        //     }
+        //     versions
+        // } else {
+        //     config
+        //         .task_states
+        //         .other_tasks
+        //         .get(&normalized_task_name)
+        //         .cloned()
+        //         .unwrap_or_default()
+        // };
+
+        let valid_versions = config
+            .task_states
+            .other_tasks
+            .get(&normalized_task_name)
+            .cloned()
+            .unwrap_or_default();
 
         if valid_versions.is_empty() {
             self.missing_states

@@ -46,69 +46,67 @@ impl TaskImplementationCollector {
                 .collect();
 
             // Handle GitVersion tasks
-            if content.contains("gitversion/setup") || content.contains("gitversion/execute") {
-                let mut setup_version = None;
-                let mut execute_version = None;
-                let mut spec_version = None;
+            // if content.contains("gitversion/setup") || content.contains("gitversion/execute") {
+            //     let mut setup_version = None;
+            //     let mut execute_version = None;
+            //     let mut spec_version = None;
 
-                for (i, line) in lines.iter().enumerate() {
-                    if let Some(cap) = task_regex.captures(line) {
-                        let task_name = cap[1].to_string();
-                        let version = cap[2].to_string();
+            //     for (i, line) in lines.iter().enumerate() {
+            //         if let Some(cap) = task_regex.captures(line) {
+            //             let task_name = cap[1].to_string();
+            //             let version = cap[2].to_string();
 
-                        match task_name.as_str() {
-                            "gitversion/setup" => {
-                                setup_version = Some(version);
-                                // Look ahead for versionSpec
-                                for next_line in lines.iter().skip(i + 1).take(10) {
-                                    let next_trimmed = next_line.trim();
-                                    if next_trimmed.contains("versionSpec:") {
-                                        spec_version = Some(
-                                            next_trimmed
-                                                .split(':')
-                                                .nth(1)
-                                                .unwrap_or("")
-                                                .trim()
-                                                .trim_matches('\'')
-                                                .trim_matches('"')
-                                                .to_string(),
-                                        );
-                                        break;
-                                    }
-                                    if next_trimmed.contains("task:") {
-                                        break;
-                                    }
-                                }
-                            }
-                            "gitversion/execute" => {
-                                execute_version = Some(version);
-                            }
-                            _ => {}
-                        }
-                    }
-                }
+            //             match task_name.as_str() {
+            //                 "gitversion/setup" => {
+            //                     setup_version = Some(version);
+            //                     // Look ahead for versionSpec
+            //                     for next_line in lines.iter().skip(i + 1).take(10) {
+            //                         let next_trimmed = next_line.trim();
+            //                         if next_trimmed.contains("versionSpec:") {
+            //                             spec_version = Some(
+            //                                 next_trimmed
+            //                                     .split(':')
+            //                                     .nth(1)
+            //                                     .unwrap_or("")
+            //                                     .trim()
+            //                                     .trim_matches('\'')
+            //                                     .trim_matches('"')
+            //                                     .to_string(),
+            //                             );
+            //                             break;
+            //                         }
+            //                         if next_trimmed.contains("task:") {
+            //                             break;
+            //                         }
+            //                     }
+            //                 }
+            //                 "gitversion/execute" => {
+            //                     execute_version = Some(version);
+            //                 }
+            //                 _ => {}
+            //             }
+            //         }
+            //     }
 
-                if setup_version.is_some() || execute_version.is_some() {
-                    collected.push(CollectedTask::GitVersion {
-                        setup_version,
-                        execute_version,
-                        spec_version,
-                        file_path: pipeline_file.clone(),
-                    });
-                }
-            }
+            //     if setup_version.is_some() || execute_version.is_some() {
+            //         collected.push(CollectedTask::GitVersion {
+            //             setup_version,
+            //             execute_version,
+            //             spec_version,
+            //             file_path: pipeline_file.clone(),
+            //         });
+            //     }
+            // }
 
             // Handle regular tasks
             for line in lines {
                 if let Some(cap) = task_regex.captures(line) {
                     let task_name = cap[1].to_string();
-                    if !task_name.starts_with("gitversion/") {
-                        collected.push(CollectedTask::Regular {
-                            task_name,
-                            version: cap[2].to_string(),
-                            file_path: pipeline_file.clone(),
-                        });
-                    }
+                    collected.push(CollectedTask::Regular {
+                        task_name,
+                        version: cap[2].to_string(),
+                        file_path: pipeline_file.clone(),
+                    });
                 }
             }
         }
