@@ -11,7 +11,6 @@ pub mod git_manager;
 pub mod pipeline_analyzer;
 pub mod pipeline_detector;
 pub mod report;
-pub mod utils;
 
 // Re-export commonly used types
 pub use cli::Cli;
@@ -67,22 +66,6 @@ impl std::fmt::Display for TaskValidState {
 }
 
 impl SupportedTask {}
-
-pub fn format_task_states(_task: &SupportedTask, states: Vec<TaskValidState>) -> String {
-    if states.is_empty() {
-        return "None".to_string();
-    }
-
-    states
-        .iter()
-        .map(|state| format!("- {}", state))
-        .collect::<Vec<_>>()
-        .join("\n")
-}
-
-pub fn parse_task_name(name: &str) -> Result<SupportedTask> {
-    Ok(SupportedTask::Default(name.to_string()))
-}
 
 #[derive(Default)]
 pub struct TaskIssues {

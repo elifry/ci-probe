@@ -14,18 +14,17 @@ pub struct Credentials {
     pub token: String,
 }
 
+// First try to load from CLI, then from environment variables, then from .env file
 impl Credentials {
     pub fn load(cli_credentials: &Option<String>) -> Result<Self> {
         if let Some(creds_str) = cli_credentials {
-            // Parse credentials from CLI argument
             Self::from_string(creds_str)
         } else if let (Ok(username), Ok(token)) =
             (env::var("AZURE_USERNAME"), env::var("AZURE_TOKEN"))
         {
-            // Load credentials from environment variables
             Ok(Credentials { username, token })
         } else {
-            dotenv().ok(); // Attempt to load from .env file
+            dotenv().ok();
             if let (Ok(username), Ok(token)) = (env::var("AZURE_USERNAME"), env::var("AZURE_TOKEN"))
             {
                 Ok(Credentials { username, token })
