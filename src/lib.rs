@@ -48,10 +48,13 @@ impl std::str::FromStr for SupportedTask {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            // "gitversion" => Ok(SupportedTask::Gitversion),
-            other => Ok(SupportedTask::Default(other.to_string())),
-        }
+        // match s.to_lowercase().as_str() {
+        //     "gitversion" => Ok(SupportedTask::Gitversion),
+        //     other => Ok(SupportedTask::Default(other.to_string())),
+        // }
+        let binding = s.to_lowercase();
+        let other = binding.as_str();
+        Ok(SupportedTask::Default(other.to_string()))
     }
 }
 

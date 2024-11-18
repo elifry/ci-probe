@@ -245,6 +245,7 @@ fn generate_missing_states_section(md: &mut String, issues: &TaskIssues) -> Resu
     Ok(())
 }
 
+#[allow(clippy::infallible_destructuring_match)]
 fn generate_valid_states_section(
     md: &mut String,
     issues: &TaskIssues,
