@@ -18,7 +18,7 @@ pub use cli_handler::handle_cli;
 pub use config::{Config, Credentials, VersionCompare};
 pub use git_manager::GitManager;
 pub use pipeline_analyzer::{CollectedTask, TaskImplementationCollector};
-pub use pipeline_detector::{find_pipeline_files, PipelineDetector};
+pub use pipeline_detector::find_pipeline_files;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", content = "value")]

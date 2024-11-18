@@ -2,6 +2,8 @@ use crate::config::Credentials;
 use anyhow::{anyhow, Context, Result};
 use std::{path::PathBuf, process::Command};
 
+const SPARSE_PATTERNS: [&str; 2] = ["*.yml", "*.yaml"];
+
 pub struct GitManager {
     repo_url: String,
     repo_dir: PathBuf,
@@ -85,24 +87,11 @@ impl GitManager {
             return Err(anyhow::anyhow!("Failed to configure sparse checkout"));
         }
 
-        // Create sparse-checkout file with pipeline patterns
-        let sparse_patterns = [
-            "*.yml",
-            "*.yaml",
-            "**/azure-pipelines.yml",
-            "**/azure-pipelines.yaml",
-            "**/*.pipeline.yml",
-            "**/*.pipeline.yaml",
-            ".github/workflows/*.yml",
-            ".github/workflows/*.yaml",
-            ".gitlab-ci.yml",
-        ];
-
         let sparse_checkout_dir = self.repo_dir.join(".git").join("info");
         std::fs::create_dir_all(&sparse_checkout_dir)?;
 
         let sparse_checkout_file = sparse_checkout_dir.join("sparse-checkout");
-        std::fs::write(&sparse_checkout_file, sparse_patterns.join("\n"))?;
+        std::fs::write(&sparse_checkout_file, SPARSE_PATTERNS.join("\n"))?;
 
         // Add remote
         let output = Command::new("git")
@@ -213,22 +202,9 @@ impl GitManager {
             return Err(anyhow::anyhow!("Failed to configure sparse checkout"));
         }
 
-        // Update sparse-checkout patterns if needed
-        let sparse_patterns = [
-            "*.yml",
-            "*.yaml",
-            "**/azure-pipelines.yml",
-            "**/azure-pipelines.yaml",
-            "**/*.pipeline.yml",
-            "**/*.pipeline.yaml",
-            ".github/workflows/*.yml",
-            ".github/workflows/*.yaml",
-            ".gitlab-ci.yml",
-        ];
-
         let sparse_checkout_dir = self.repo_dir.join(".git").join("info");
         let sparse_checkout_file = sparse_checkout_dir.join("sparse-checkout");
-        std::fs::write(&sparse_checkout_file, sparse_patterns.join("\n"))?;
+        std::fs::write(&sparse_checkout_file, SPARSE_PATTERNS.join("\n"))?;
 
         // Reset any local changes
         let reset_output = Command::new("git")
