@@ -12,6 +12,7 @@ pub fn find_pipeline_files(repo_path: &PathBuf, verbose: bool) -> Result<Vec<Pat
         .follow_links(true)
         .into_iter()
         .filter_map(Result::ok)
+        .filter(|e| e.file_type().is_file())
         .map(|e| e.path().to_path_buf())
         .collect();
 
