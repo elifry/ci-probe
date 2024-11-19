@@ -43,13 +43,25 @@ impl YamlConfig {
             }
 
             if in_task_versions && indent > current_indent {
-                if trimmed.starts_with('\'') && trimmed.ends_with('\'') {
-                    current_task = trimmed[1..trimmed.len() - 1].to_string();
+                if trimmed.ends_with(':') {
+                    let task_name = trimmed
+                        .trim_end_matches(':')
+                        .trim_matches('\'')
+                        .trim_matches('"')
+                        .trim();
+                    current_task = task_name.to_string();
                     task_versions.insert(current_task.clone(), Vec::new());
-                } else if trimmed.starts_with("- '") && trimmed.ends_with('\'') {
-                    let version = trimmed[3..trimmed.len() - 1].to_string();
-                    if let Some(versions) = task_versions.get_mut(&current_task) {
-                        versions.push(version);
+                } else if trimmed.starts_with('-') {
+                    let version = trimmed
+                        .trim_start_matches('-')
+                        .trim()
+                        .trim_matches('\'')
+                        .trim_matches('"')
+                        .trim();
+                    if !version.is_empty() && !current_task.is_empty() {
+                        if let Some(versions) = task_versions.get_mut(&current_task) {
+                            versions.push(version.to_string());
+                        }
                     }
                 }
             } else if indent <= current_indent {
