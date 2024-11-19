@@ -74,8 +74,7 @@ impl TaskIssues {
             });
 
         let valid_versions = config
-            .task_states
-            .other_tasks
+            .task_versions
             .get(&normalized_task_name)
             .cloned()
             .unwrap_or_default();

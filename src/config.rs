@@ -79,22 +79,7 @@ impl VersionCompare for String {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
-    pub task_states: TaskStates,
-}
-
-#[derive(Debug, Default, Serialize, Deserialize)]
-pub struct TaskStates {
-    #[serde(default)]
-    pub other_tasks: HashMap<String, Vec<String>>,
-}
-
-impl TaskStates {
-    pub fn get_valid_versions(&self, task_name: &str) -> Vec<&str> {
-        self.other_tasks
-            .get(task_name)
-            .map(|v| v.iter().map(|s| s.as_str()).collect())
-            .unwrap_or_default()
-    }
+    pub task_versions: HashMap<String, Vec<String>>,
 }
 
 impl Config {
@@ -114,24 +99,26 @@ impl Config {
     }
 
     pub fn get_all_tasks(&self) -> Vec<SupportedTask> {
-        let mut tasks = vec![];
-        tasks.extend(
-            self.task_states
-                .other_tasks
-                .keys()
-                .map(|name| SupportedTask::Default(name.clone())),
-        );
-        tasks
+        self.task_versions
+            .keys()
+            .map(|name| SupportedTask::Default(name.clone()))
+            .collect()
     }
 
     fn normalize_task_names(&mut self) {
         let normalized_tasks: HashMap<String, Vec<String>> = self
-            .task_states
-            .other_tasks
+            .task_versions
             .iter()
             .map(|(k, v)| (k.to_lowercase(), v.clone()))
             .collect();
 
-        self.task_states.other_tasks = normalized_tasks;
+        self.task_versions = normalized_tasks;
+    }
+
+    pub fn get_valid_versions(&self, task_name: &str) -> Vec<&str> {
+        self.task_versions
+            .get(task_name)
+            .map(|v| v.iter().map(|s| s.as_str()).collect())
+            .unwrap_or_default()
     }
 }

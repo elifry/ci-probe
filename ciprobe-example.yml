@@ -1,8 +1,7 @@
-task_states:
-  other_tasks:
-    "UseNode":
-      - "1"
-    "gitversion/setup":
-      - "3"
-    "gitversion/execute":
-      - "3"
+task_versions:
+  'UseNode':
+    - '1'
+  'gitversion/setup':
+    - '3'
+  'gitversion/execute':
+    - '3'

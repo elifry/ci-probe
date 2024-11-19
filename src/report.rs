@@ -151,7 +151,7 @@ fn generate_invalid_states_section(
             .map(|(_, v)| v.as_str())
             .unwrap_or(task_normalized);
 
-        let valid_versions: Vec<_> = config.task_states.get_valid_versions(task_normalized);
+        let valid_versions: Vec<_> = config.get_valid_versions(task_normalized);
 
         md.push_str(&format!(
             "### 🔧 {} (expected: {})\n\n",

@@ -1,0 +1,9 @@
+task_versions:
+  'UseNode':
+    - '1'
+  'ArchiveFiles':
+    - '1'
+  'CopyFiles':
+    - '1'
+  'Docker':
+    - '1'
