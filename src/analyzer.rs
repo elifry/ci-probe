@@ -121,6 +121,14 @@ fn analyze_single_repo(
 
 fn analyze_pipeline_file(file_path: &PathBuf, verbose: bool) -> Result<HashSet<String>> {
     let content = fs::read_to_string(file_path)?;
+
+    if !content.contains("task:") {
+        if verbose {
+            println!("   └─ Skipping: No task definitions found");
+        }
+        return Ok(HashSet::new());
+    }
+
     let mut found_tasks = HashSet::new();
 
     if verbose {

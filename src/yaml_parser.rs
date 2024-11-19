@@ -13,6 +13,12 @@ impl YamlConfig {
         let content = fs::read_to_string(path)
             .map_err(|e| Error::Config(format!("Failed to read config file: {}", e)))?;
 
+        if !content.contains("task_versions:") {
+            return Err(Error::Config(
+                "Invalid config file: missing task_versions section".to_string(),
+            ));
+        }
+
         Self::parse(&content)
     }
 
@@ -37,23 +43,22 @@ impl YamlConfig {
             }
 
             if in_task_versions && indent > current_indent {
-                if let Some(task_name) = trimmed
-                    .strip_prefix('\'')
-                    .and_then(|s| s.strip_suffix('\''))
-                {
-                    current_task = task_name.to_string();
+                if trimmed.starts_with('\'') && trimmed.ends_with('\'') {
+                    current_task = trimmed[1..trimmed.len()-1].to_string();
                     task_versions.insert(current_task.clone(), Vec::new());
-                } else if let Some(version) = trimmed
-                    .strip_prefix("- '")
-                    .and_then(|s| s.strip_suffix('\''))
-                {
+                } else if trimmed.starts_with("- '") && trimmed.ends_with('\'') {
+                    let version = trimmed[3..trimmed.len()-1].to_string();
                     if let Some(versions) = task_versions.get_mut(&current_task) {
-                        versions.push(version.to_string());
+                        versions.push(version);
                     }
                 }
             } else if indent <= current_indent {
                 in_task_versions = false;
             }
+        }
+
+        if task_versions.is_empty() {
+            return Err(Error::Config("No valid task versions found in config".to_string()));
         }
 
         Ok(YamlConfig { task_versions })
