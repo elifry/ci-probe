@@ -1,7 +1,6 @@
+use crate::{Config, SupportedTask, TaskIssues};
 use anyhow::Result;
 use std::collections::HashSet;
-
-use crate::{Config, SupportedTask, TaskIssues};
 
 pub async fn generate_markdown_report(
     repos: &[String],

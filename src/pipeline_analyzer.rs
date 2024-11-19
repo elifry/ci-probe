@@ -3,12 +3,7 @@ use regex::Regex;
 use std::collections::HashSet;
 use std::path::PathBuf;
 
-use crate::{
-    config::{Config, Credentials},
-    git_manager::GitManager,
-    pipeline_detector::find_pipeline_files,
-    SupportedTask, TaskIssues,
-};
+use crate::{find_pipeline_files, Config, Credentials, GitManager, SupportedTask, TaskIssues};
 
 #[derive(Debug)]
 pub enum CollectedTask {

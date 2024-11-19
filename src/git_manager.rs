@@ -1,4 +1,4 @@
-use crate::config::Credentials;
+use crate::Credentials;
 use anyhow::{anyhow, Context, Result};
 use std::{path::PathBuf, process::Command};
 
