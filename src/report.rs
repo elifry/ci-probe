@@ -1,6 +1,7 @@
 use crate::{Config, SupportedTask, TaskIssues};
 use anyhow::Result;
 use std::collections::HashSet;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 pub fn generate_markdown_report(
     repos: &[String],
@@ -25,12 +26,20 @@ pub fn generate_markdown_report(
 }
 
 fn generate_header(md: &mut String, repos: &[String], issues: &TaskIssues) {
-    let now = chrono::Local::now();
     md.push_str("# 📊 Pipeline Task Analysis Report\n\n");
-    md.push_str(&format!(
-        "🕒 Generated on: {}\n\n",
-        now.format("%Y-%m-%d %H:%M:%S")
-    ));
+
+    let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    let secs = now.as_secs();
+    let datetime = format!(
+        "{:04}-{:02}-{:02} {:02}:{:02}:{:02}",
+        1970 + (secs / 31536000),          // years since 1970
+        ((secs % 31536000) / 2592000) + 1, // months
+        ((secs % 2592000) / 86400) + 1,    // days
+        (secs % 86400) / 3600,             // hours
+        (secs % 3600) / 60,                // minutes
+        secs % 60                          // seconds
+    );
+    md.push_str(&format!("🕒 Generated on: {}\n\n", datetime));
 
     // Analyzed repositories
     md.push_str("## 📚 Analyzed Repositories\n\n");

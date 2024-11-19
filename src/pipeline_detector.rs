@@ -1,22 +1,13 @@
 use anyhow::Result;
-use std::path::PathBuf;
-use walkdir::WalkDir;
+use std::{fs, path::PathBuf};
 
 pub fn find_pipeline_files(repo_path: &PathBuf, verbose: bool) -> Result<Vec<PathBuf>> {
     if verbose {
         println!("Searching for pipeline files in {:?}", repo_path);
     }
 
-    let pipeline_files: Vec<PathBuf> = WalkDir::new(repo_path)
-        .follow_links(true)
-        .into_iter()
-        .filter_map(Result::ok)
-        .map(|e| e.path().to_path_buf())
-        .filter(|path| {
-            path.extension()
-                .map_or(false, |ext| ext == "yml" || ext == "yaml")
-        })
-        .collect();
+    let mut pipeline_files = Vec::new();
+    find_yaml_files_recursive(repo_path, &mut pipeline_files)?;
 
     if verbose {
         for path in &pipeline_files {
@@ -32,4 +23,20 @@ pub fn find_pipeline_files(repo_path: &PathBuf, verbose: bool) -> Result<Vec<Pat
     }
 
     Ok(pipeline_files)
+}
+
+fn find_yaml_files_recursive(dir: &PathBuf, files: &mut Vec<PathBuf>) -> Result<()> {
+    for entry in fs::read_dir(dir)? {
+        let entry = entry?;
+        let path = entry.path();
+
+        if path.is_dir() {
+            find_yaml_files_recursive(&path, files)?;
+        } else if let Some(ext) = path.extension() {
+            if ext == "yml" || ext == "yaml" {
+                files.push(path);
+            }
+        }
+    }
+    Ok(())
 }
