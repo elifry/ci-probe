@@ -44,10 +44,10 @@ impl YamlConfig {
 
             if in_task_versions && indent > current_indent {
                 if trimmed.starts_with('\'') && trimmed.ends_with('\'') {
-                    current_task = trimmed[1..trimmed.len()-1].to_string();
+                    current_task = trimmed[1..trimmed.len() - 1].to_string();
                     task_versions.insert(current_task.clone(), Vec::new());
                 } else if trimmed.starts_with("- '") && trimmed.ends_with('\'') {
-                    let version = trimmed[3..trimmed.len()-1].to_string();
+                    let version = trimmed[3..trimmed.len() - 1].to_string();
                     if let Some(versions) = task_versions.get_mut(&current_task) {
                         versions.push(version);
                     }
@@ -58,7 +58,9 @@ impl YamlConfig {
         }
 
         if task_versions.is_empty() {
-            return Err(Error::Config("No valid task versions found in config".to_string()));
+            return Err(Error::Config(
+                "No valid task versions found in config".to_string(),
+            ));
         }
 
         Ok(YamlConfig { task_versions })
