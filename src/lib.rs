@@ -17,4 +17,4 @@ pub use config::{Config, Credentials, VersionCompare};
 pub use git_manager::GitManager;
 pub use pipeline_detector::find_pipeline_files;
 pub use task_issues::TaskIssues;
-pub use task_types::{SupportedTask, TaskImplementation, TaskValidState};
+pub use task_types::{SupportedTask, TaskImplementation};
