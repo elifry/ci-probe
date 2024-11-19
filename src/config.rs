@@ -1,5 +1,4 @@
 use crate::error::{Error, Result};
-use dotenv::dotenv;
 use std::collections::HashMap;
 use std::env;
 use std::path::Path;
@@ -23,15 +22,10 @@ impl Credentials {
         {
             Ok(Credentials { username, token })
         } else {
-            dotenv().ok();
-            if let (Ok(username), Ok(token)) = (env::var("AZURE_USERNAME"), env::var("AZURE_TOKEN"))
-            {
-                Ok(Credentials { username, token })
-            } else {
-                Err(Error::Config(
-                    "Credentials not found in environment or .env file".to_string(),
-                ))
-            }
+            Err(Error::Config(
+                "Credentials not found. Please provide them via CLI or environment variables"
+                    .to_string(),
+            ))
         }
     }
 

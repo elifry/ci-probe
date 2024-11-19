@@ -65,8 +65,7 @@ You can add multiple versions to a task to support multiple task versions, if yo
 Credentials can be provided in order of precedence:
 
 1. Command line: `--credentials "username:token"`
-2. Environment: `AZURE_USERNAME` and `AZURE_TOKEN`
-3. `.env` file: containing above environment variables
+2. Environment variables: `AZURE_USERNAME` and `AZURE_TOKEN`
 
 ### Generated Report
 
