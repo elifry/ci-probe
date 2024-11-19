@@ -3,5 +3,7 @@ task_versions:
     - '1'
   'gitversion/setup':
     - '3'
+    - '2'
   'gitversion/execute':
     - '3'
+    - '2'
