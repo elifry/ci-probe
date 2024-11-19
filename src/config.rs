@@ -1,6 +1,5 @@
 use anyhow::Result;
 use dotenv::dotenv;
-use semver::Version;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::env;
@@ -52,27 +51,47 @@ impl Credentials {
 }
 
 pub trait VersionCompare {
-    fn version_eq(&self, other: &str) -> bool;
+    fn version_matches(&self, other: &str) -> bool;
 }
 
 impl VersionCompare for String {
-    fn version_eq(&self, other: &str) -> bool {
-        // Normalize version strings
-        let normalize = |v: &str| -> Result<Version> {
-            // Handle versions like "1", "1.0", "1.0.0"
-            let v = if v.chars().all(|c| c.is_ascii_digit()) {
-                format!("{}.0.0", v)
-            } else if v.matches('.').count() == 1 {
-                format!("{}.0", v)
+    fn version_matches(&self, other: &str) -> bool {
+        // Split versions into numeric components
+        let parse_version = |v: &str| {
+            let parts: Vec<_> = v.split('.').collect();
+            // Check if all parts are valid numbers
+            if parts.iter().all(|n| n.parse::<u32>().is_ok()) {
+                Some(
+                    parts
+                        .iter()
+                        .map(|n| n.parse::<u32>().unwrap())
+                        .collect::<Vec<_>>(),
+                )
             } else {
-                v.to_string()
-            };
-            Version::parse(&v).map_err(|e| anyhow::anyhow!("Invalid version: {}", e))
+                None
+            }
         };
 
-        match (normalize(self), normalize(other)) {
-            (Ok(v1), Ok(v2)) => v1 == v2,
-            _ => self == other, // Fallback to string comparison if parsing fails
+        match (parse_version(self), parse_version(other)) {
+            (Some(v1), Some(v2)) => {
+                // Both are valid version numbers, pad and compare
+                let max_len = v1.len().max(v2.len());
+                let v1_padded: Vec<u32> = v1
+                    .into_iter()
+                    .chain(std::iter::repeat(0))
+                    .take(max_len)
+                    .collect();
+                let v2_padded: Vec<u32> = v2
+                    .into_iter()
+                    .chain(std::iter::repeat(0))
+                    .take(max_len)
+                    .collect();
+                v1_padded == v2_padded
+            }
+            _ => {
+                // One or both are invalid, fall back to string comparison
+                self == other
+            }
         }
     }
 }

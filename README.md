@@ -82,7 +82,6 @@ The tool generates a detailed `report.md` containing:
 ## Technical Details
 
 - Uses sparse checkout to minimize network traffic and disk usage
-- Supports semantic version comparison
 - Normalizes task names for consistent matching
 
 ## Requirements when Running the Binary
