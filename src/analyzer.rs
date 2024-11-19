@@ -5,52 +5,6 @@ use std::path::PathBuf;
 
 use crate::{find_pipeline_files, Config, Credentials, GitManager, SupportedTask, TaskIssues};
 
-#[derive(Debug)]
-pub enum CollectedTask {
-    Regular {
-        task_name: String,
-        version: String,
-        file_path: PathBuf,
-    },
-}
-
-pub struct TaskImplementationCollector {
-    pub repo_path: PathBuf,
-    pub repo_name: String,
-}
-
-impl TaskImplementationCollector {
-    pub async fn collect(&self) -> Result<Vec<CollectedTask>> {
-        let mut collected = Vec::new();
-        let pipeline_files = find_pipeline_files(&self.repo_path, false).await?;
-
-        for pipeline_file in pipeline_files {
-            let content = std::fs::read_to_string(&pipeline_file)?;
-            let task_regex = Regex::new(r#"task:\s*([\w/]+)@(\d+)"#)?;
-
-            let lines: Vec<&str> = content
-                .lines()
-                .map(|line| line.trim())
-                .filter(|line| !line.starts_with('#') && !line.starts_with("//"))
-                .collect();
-
-            // Handle regular tasks
-            for line in lines {
-                if let Some(cap) = task_regex.captures(line) {
-                    let task_name = cap[1].to_string();
-                    collected.push(CollectedTask::Regular {
-                        task_name,
-                        version: cap[2].to_string(),
-                        file_path: pipeline_file.clone(),
-                    });
-                }
-            }
-        }
-
-        Ok(collected)
-    }
-}
-
 pub async fn analyze_pipelines(
     repos: &[String],
     credentials: &Credentials,
@@ -80,7 +34,6 @@ pub async fn analyze_pipelines(
         .await
         {
             Ok(repo_tasks) => {
-                // Store implementations and check for missing tasks
                 for task in &all_tasks {
                     let task_name = task.to_string();
                     if !repo_tasks.contains(&task_name) {
@@ -96,7 +49,6 @@ pub async fn analyze_pipelines(
     }
 
     println!("\n✅ Analysis complete");
-
     Ok(issues)
 }
 

@@ -1,7 +1,7 @@
 use crate::{
+    analyzer::analyze_pipelines,
     cli::Cli,
     config::{Config, Credentials},
-    pipeline_analyzer::analyze_pipelines,
     report::generate_markdown_report,
 };
 use anyhow::Result;
