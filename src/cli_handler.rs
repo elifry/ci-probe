@@ -5,9 +5,9 @@ use crate::{
     report::generate_markdown_report,
 };
 use anyhow::Result;
-use tokio::fs;
+use std::fs;
 
-pub async fn handle_cli(cli: &Cli) -> Result<()> {
+pub fn handle_cli(cli: &Cli) -> Result<()> {
     let credentials = Credentials::load(&cli.credentials)?;
 
     if cli.verbose {
@@ -32,16 +32,16 @@ pub async fn handle_cli(cli: &Cli) -> Result<()> {
         println!("Analyzing {} repositories...", repos.len());
     }
 
-    let issues = analyze_pipelines(&repos, &credentials, &config, cli.verbose).await?;
+    let issues = analyze_pipelines(&repos, &credentials, &config, cli.verbose)?;
 
-    let report = generate_markdown_report(&repos, &config, &issues).await?;
+    let report = generate_markdown_report(&repos, &config, &issues)?;
 
     let output_path = "report.md";
     if cli.verbose {
         println!("Writing report to {}", output_path);
     }
 
-    fs::write(output_path, report).await?;
+    fs::write(output_path, report)?;
 
     Ok(())
 }

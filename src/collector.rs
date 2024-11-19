@@ -26,9 +26,9 @@ impl TaskImplementationCollector {
         }
     }
 
-    pub async fn collect(&self) -> Result<Vec<CollectedTask>> {
+    pub fn collect(&self) -> Result<Vec<CollectedTask>> {
         let mut collected = Vec::new();
-        let pipeline_files = find_pipeline_files(&self.repo_path, false).await?;
+        let pipeline_files = find_pipeline_files(&self.repo_path, false)?;
 
         for pipeline_file in pipeline_files {
             let content = std::fs::read_to_string(&pipeline_file)?;

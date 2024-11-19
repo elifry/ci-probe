@@ -2,7 +2,7 @@ use anyhow::Result;
 use std::path::PathBuf;
 use walkdir::WalkDir;
 
-pub async fn find_pipeline_files(repo_path: &PathBuf, verbose: bool) -> Result<Vec<PathBuf>> {
+pub fn find_pipeline_files(repo_path: &PathBuf, verbose: bool) -> Result<Vec<PathBuf>> {
     if verbose {
         println!("Searching for pipeline files in {:?}", repo_path);
     }

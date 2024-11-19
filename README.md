@@ -12,7 +12,6 @@ Currently only compatible with Azure but more support will come soon.
 - Supports authentication via environment variables, .env file, or command-line arguments
 - Generates detailed Markdown reports of task usage and version discrepancies
 - Special handling for GitVersion tasks, including setup, execute, and versionSpec configurations
-- Parallel processing using tokio for improved performance
 - Configurable valid states for tasks via `ciprobeconfig.yml`
 
 ## Usage

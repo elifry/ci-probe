@@ -1,11 +1,12 @@
 use anyhow::Result;
 use regex::Regex;
 use std::collections::HashSet;
+use std::fs;
 use std::path::PathBuf;
 
 use crate::{find_pipeline_files, Config, Credentials, GitManager, SupportedTask, TaskIssues};
 
-pub async fn analyze_pipelines(
+pub fn analyze_pipelines(
     repos: &[String],
     credentials: &Credentials,
     config: &Config,
@@ -30,9 +31,7 @@ pub async fn analyze_pipelines(
             &all_tasks,
             &mut issues,
             verbose,
-        )
-        .await
-        {
+        ) {
             Ok(repo_tasks) => {
                 for task in &all_tasks {
                     let task_name = task.to_string();
@@ -52,7 +51,7 @@ pub async fn analyze_pipelines(
     Ok(issues)
 }
 
-async fn analyze_single_repo(
+fn analyze_single_repo(
     repo_url: &str,
     git_manager: &GitManager,
     config: &Config,
@@ -72,7 +71,7 @@ async fn analyze_single_repo(
     }
 
     git_manager.clone_or_update()?;
-    let pipeline_files = find_pipeline_files(git_manager.get_repo_path(), verbose).await?;
+    let pipeline_files = find_pipeline_files(git_manager.get_repo_path(), verbose)?;
 
     // Add to analyzed repos regardless of whether we find pipeline files
     issues.repos_analyzed.insert(repo_url.to_string());
@@ -91,7 +90,7 @@ async fn analyze_single_repo(
 
     let mut found_tasks = HashSet::new();
     for file in &pipeline_files {
-        let tasks = analyze_pipeline_file(file, verbose).await?;
+        let tasks = analyze_pipeline_file(file, verbose)?;
         for task_with_version in &tasks {
             if let Some((task_name, version)) = task_with_version.split_once('@') {
                 if verbose {
@@ -120,8 +119,8 @@ async fn analyze_single_repo(
     Ok(found_tasks)
 }
 
-async fn analyze_pipeline_file(file_path: &PathBuf, verbose: bool) -> Result<HashSet<String>> {
-    let content = tokio::fs::read_to_string(file_path).await?;
+fn analyze_pipeline_file(file_path: &PathBuf, verbose: bool) -> Result<HashSet<String>> {
+    let content = fs::read_to_string(file_path)?;
     let task_regex = Regex::new(r#"task:\s*([\w/]+)@(\d+)"#)?;
     let mut found_tasks = HashSet::new();
 
