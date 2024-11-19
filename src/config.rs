@@ -1,4 +1,4 @@
-use anyhow::Result;
+use crate::error::{Error, Result};
 use dotenv::dotenv;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -28,8 +28,8 @@ impl Credentials {
             {
                 Ok(Credentials { username, token })
             } else {
-                Err(anyhow::anyhow!(
-                    "Credentials not found in environment or .env file"
+                Err(Error::Config(
+                    "Credentials not found in environment or .env file".to_string(),
                 ))
             }
         }
@@ -38,8 +38,8 @@ impl Credentials {
     pub fn from_string(credentials: &str) -> Result<Self> {
         let parts: Vec<&str> = credentials.split(':').collect();
         if parts.len() != 2 {
-            return Err(anyhow::anyhow!(
-                "Invalid credentials format. Expected 'username:token'"
+            return Err(Error::Config(
+                "Invalid credentials format. Expected 'username:token'".to_string(),
             ));
         }
 
@@ -106,12 +106,15 @@ impl Config {
         let path = path.unwrap_or_else(|| Path::new("ciprobeconfig.yml"));
 
         if !path.exists() {
-            return Err(anyhow::anyhow!("Config file not found at {:?}", path));
+            return Err(Error::Config(format!(
+                "Config file not found at {:?}",
+                path
+            )));
         }
 
         let content = std::fs::read_to_string(path)?;
         let mut config: Config = serde_yaml::from_str(&content)
-            .map_err(|e| anyhow::anyhow!("Failed to parse config file: {}", e))?;
+            .map_err(|e| Error::Config(format!("Failed to parse config file: {}", e)))?;
 
         config.normalize_task_names();
         Ok(config)

@@ -1,3 +1,4 @@
+use crate::error::{Error, Result};
 use std::path::PathBuf;
 
 #[derive(Default, Debug)]
@@ -9,7 +10,7 @@ pub struct Cli {
 }
 
 impl Cli {
-    pub fn parse() -> anyhow::Result<Self> {
+    pub fn parse() -> Result<Self> {
         let mut cli = Cli::default();
         let mut args = std::env::args().skip(1);
 
@@ -18,7 +19,7 @@ impl Cli {
                 "--repos" => {
                     cli.repos = args
                         .next()
-                        .ok_or_else(|| anyhow::anyhow!("--repos requires a value"))?;
+                        .ok_or_else(|| Error::Cli("--repos requires a value".to_string()))?;
                 }
                 "--credentials" => {
                     cli.credentials = args.next();
@@ -44,13 +45,13 @@ impl Cli {
                     std::process::exit(0);
                 }
                 _ => {
-                    return Err(anyhow::anyhow!("Unknown argument: {}", arg));
+                    return Err(Error::Cli(format!("Unknown argument: {}", arg)));
                 }
             }
         }
 
         if cli.repos.is_empty() {
-            return Err(anyhow::anyhow!("--repos argument is required"));
+            return Err(Error::Cli("--repos argument is required".to_string()));
         }
 
         Ok(cli)

@@ -1,5 +1,4 @@
-use crate::{Config, SupportedTask, TaskIssues};
-use anyhow::Result;
+use crate::{error::Result, Config, SupportedTask, TaskIssues};
 use std::collections::HashSet;
 use std::time::{SystemTime, UNIX_EPOCH};
 

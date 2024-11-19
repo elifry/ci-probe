@@ -1,4 +1,4 @@
-use anyhow::Result;
+use crate::error::Result;
 use std::{fs, path::PathBuf};
 
 pub fn find_pipeline_files(repo_path: &PathBuf, verbose: bool) -> Result<Vec<PathBuf>> {

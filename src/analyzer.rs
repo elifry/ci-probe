@@ -1,12 +1,10 @@
-use anyhow::Result;
+use crate::{
+    error::Result, find_pipeline_files, parse_task_definition, Config, Credentials, GitManager,
+    SupportedTask, TaskIssues,
+};
 use std::collections::HashSet;
 use std::fs;
 use std::path::PathBuf;
-
-use crate::{
-    find_pipeline_files, parse_task_definition, Config, Credentials, GitManager, SupportedTask,
-    TaskIssues,
-};
 
 pub fn analyze_pipelines(
     repos: &[String],

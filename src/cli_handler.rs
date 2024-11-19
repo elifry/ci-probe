@@ -2,9 +2,9 @@ use crate::{
     analyzer::analyze_pipelines,
     cli::Cli,
     config::{Config, Credentials},
+    error::{Error, Result},
     report::generate_markdown_report,
 };
-use anyhow::Result;
 use std::fs;
 
 pub fn handle_cli(cli: &Cli) -> Result<()> {
@@ -25,7 +25,7 @@ pub fn handle_cli(cli: &Cli) -> Result<()> {
         .collect();
 
     if repos.is_empty() {
-        return Err(anyhow::anyhow!("No repositories specified"));
+        return Err(Error::Config("No repositories specified".to_string()));
     }
 
     if cli.verbose {

@@ -1,5 +1,7 @@
-use crate::Credentials;
-use anyhow::{anyhow, Context, Result};
+use crate::{
+    error::{Error, Result},
+    Credentials,
+};
 use std::{path::PathBuf, process::Command};
 
 const SPARSE_PATTERNS: [&str; 2] = ["*.yml", "*.yaml"];
@@ -30,7 +32,7 @@ impl GitManager {
         };
 
         let repo_dir = std::env::current_dir()
-            .context("Failed to get current directory")?
+            .map_err(Error::Io)?
             .join("temp_repos")
             .join(&repo_name);
 
@@ -47,7 +49,7 @@ impl GitManager {
                 return Ok(branch.to_string());
             }
         }
-        Err(anyhow::anyhow!("No default branch found"))
+        Err(Error::Git("No default branch found".to_string()))
     }
 
     pub fn get_repo_path(&self) -> &PathBuf {
@@ -83,7 +85,7 @@ impl GitManager {
             .output()?;
 
         if !output.status.success() {
-            return Err(anyhow::anyhow!("Failed to initialize repository"));
+            return Err(Error::Git("Failed to initialize repository".to_string()));
         }
 
         // Configure sparse checkout
@@ -93,7 +95,9 @@ impl GitManager {
             .output()?;
 
         if !output.status.success() {
-            return Err(anyhow::anyhow!("Failed to configure sparse checkout"));
+            return Err(Error::Git(
+                "Failed to configure sparse checkout".to_string(),
+            ));
         }
 
         let sparse_checkout_dir = self.repo_dir.join(".git").join("info");
@@ -109,7 +113,7 @@ impl GitManager {
             .output()?;
 
         if !output.status.success() {
-            return Err(anyhow::anyhow!("Failed to add remote"));
+            return Err(Error::Git("Failed to add remote".to_string()));
         }
 
         let default_branch = Self::try_default_branches(&self.repo_dir)?;
@@ -144,7 +148,7 @@ impl GitManager {
         if output.status.success() {
             Ok(branch_name.to_string())
         } else {
-            Err(anyhow::anyhow!("Branch {} not found", branch_name))
+            Err(Error::Git(format!("Branch {} not found", branch_name)))
         }
     }
 
@@ -182,7 +186,9 @@ impl GitManager {
             .output()?;
 
         if !output.status.success() {
-            return Err(anyhow::anyhow!("Failed to configure sparse checkout"));
+            return Err(Error::Git(
+                "Failed to configure sparse checkout".to_string(),
+            ));
         }
 
         let sparse_checkout_dir = self.repo_dir.join(".git").join("info");
@@ -197,7 +203,10 @@ impl GitManager {
 
         if !reset_output.status.success() {
             println!("✗ Failed to reset repository {}", repo_name);
-            return Err(anyhow::anyhow!("Failed to reset repository {}", repo_name));
+            return Err(Error::Git(format!(
+                "Failed to reset repository {}",
+                repo_name
+            )));
         }
 
         // Pull latest changes
@@ -210,7 +219,10 @@ impl GitManager {
             let error = String::from_utf8_lossy(&pull_output.stderr);
             println!("✗ Failed to update repository {}", repo_name);
             println!("Error: {}", error);
-            return Err(anyhow::anyhow!("Failed to update repository {}", repo_name));
+            return Err(Error::Git(format!(
+                "Failed to update repository {}",
+                repo_name
+            )));
         }
 
         if self.verbose {
@@ -229,7 +241,7 @@ impl GitManager {
         if output.status.success() {
             Ok(())
         } else {
-            Err(anyhow!("Branch {} not found", branch_name))
+            Err(Error::Git(format!("Branch {} not found", branch_name)))
         }
     }
 }
