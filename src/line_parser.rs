@@ -11,13 +11,14 @@ pub fn parse_task_definition(line: &str) -> Option<TaskDefinition> {
         return None;
     }
 
-    // Must start with "task:"
-    if !line.starts_with("task:") {
+    // Skip comments
+    if line.starts_with('#') || line.starts_with("//") {
         return None;
     }
 
-    // Split after "task:" and trim whitespace
-    let after_task = line[5..].trim();
+    // Find "task:" anywhere in the line and get everything after "task:"
+    let task_pos = line.find("task:")?;
+    let after_task = line[task_pos + 5..].trim();
 
     // Find the @ symbol
     let at_pos = after_task.find('@')?;

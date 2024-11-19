@@ -39,3 +39,30 @@ fn test_whitespace_handling() {
         })
     );
 }
+
+#[test]
+fn test_indented_tasks() {
+    assert_eq!(
+        parse_task_definition("    task: my/task@123"),
+        Some(TaskDefinition {
+            name: "my/task".to_string(),
+            version: "123".to_string(),
+        })
+    );
+
+    assert_eq!(
+        parse_task_definition("  - task: my/task@123"),
+        Some(TaskDefinition {
+            name: "my/task".to_string(),
+            version: "123".to_string(),
+        })
+    );
+
+    assert_eq!(
+        parse_task_definition("steps:\n  - task: my/task@123"),
+        Some(TaskDefinition {
+            name: "my/task".to_string(),
+            version: "123".to_string(),
+        })
+    );
+}
