@@ -7,15 +7,12 @@ pub fn find_pipeline_files(repo_path: &PathBuf, verbose: bool) -> Result<Vec<Pat
         println!("Searching for pipeline files in {:?}", repo_path);
     }
 
+    // Note: This assumes that the only files in the repo are yml/yaml files already
     let pipeline_files: Vec<PathBuf> = WalkDir::new(repo_path)
         .follow_links(true)
         .into_iter()
         .filter_map(Result::ok)
         .map(|e| e.path().to_path_buf())
-        .filter(|path| {
-            path.extension()
-                .map_or(false, |ext| ext == "yml" || ext == "yaml")
-        })
         .collect();
 
     if verbose {
