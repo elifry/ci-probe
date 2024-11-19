@@ -10,6 +10,7 @@ pub mod pipeline_detector;
 pub mod report;
 pub mod task_issues;
 pub mod task_types;
+pub mod yaml_parser;
 
 pub use analyzer::analyze_pipelines;
 pub use cli::Cli;
@@ -22,3 +23,4 @@ pub use line_parser::parse_task_definition;
 pub use pipeline_detector::find_pipeline_files;
 pub use task_issues::TaskIssues;
 pub use task_types::{SupportedTask, TaskImplementation};
+pub use yaml_parser::YamlConfig;

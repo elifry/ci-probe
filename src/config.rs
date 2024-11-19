@@ -1,10 +1,10 @@
 use crate::error::{Error, Result};
 use dotenv::dotenv;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::env;
 use std::path::Path;
 
+use crate::yaml_parser::YamlConfig;
 use crate::SupportedTask;
 
 #[derive(Debug, Clone)]
@@ -96,7 +96,7 @@ impl VersionCompare for String {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug)]
 pub struct Config {
     pub task_versions: HashMap<String, Vec<String>>,
 }
@@ -112,9 +112,10 @@ impl Config {
             )));
         }
 
-        let content = std::fs::read_to_string(path)?;
-        let mut config: Config = serde_yaml::from_str(&content)
-            .map_err(|e| Error::Config(format!("Failed to parse config file: {}", e)))?;
+        let yaml_config = YamlConfig::load_from_file(path)?;
+        let mut config = Config {
+            task_versions: yaml_config.task_versions,
+        };
 
         config.normalize_task_names();
         Ok(config)
