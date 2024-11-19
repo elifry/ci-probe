@@ -1,10 +1,12 @@
 use anyhow::Result;
-use regex::Regex;
 use std::collections::HashSet;
 use std::fs;
 use std::path::PathBuf;
 
-use crate::{find_pipeline_files, Config, Credentials, GitManager, SupportedTask, TaskIssues};
+use crate::{
+    find_pipeline_files, parse_task_definition, Config, Credentials, GitManager, SupportedTask,
+    TaskIssues,
+};
 
 pub fn analyze_pipelines(
     repos: &[String],
@@ -121,7 +123,6 @@ fn analyze_single_repo(
 
 fn analyze_pipeline_file(file_path: &PathBuf, verbose: bool) -> Result<HashSet<String>> {
     let content = fs::read_to_string(file_path)?;
-    let task_regex = Regex::new(r#"task:\s*([\w/]+)@(\d+)"#)?;
     let mut found_tasks = HashSet::new();
 
     if verbose {
@@ -132,13 +133,14 @@ fn analyze_pipeline_file(file_path: &PathBuf, verbose: bool) -> Result<HashSet<S
     }
 
     for line in content.lines() {
-        if let Some(cap) = task_regex.captures(line.trim()) {
-            let task_name = cap[1].to_string();
-            let version = cap[2].to_string();
-            let task_with_version = format!("{}@{}", task_name, version);
+        if let Some(task) = parse_task_definition(line) {
+            let task_with_version = format!("{}@{}", task.name, task.version);
 
             if verbose {
-                println!("   ├─ 🔍 Found task: {} @ version {}", task_name, version);
+                println!(
+                    "   ├─ 🔍 Found task: {} @ version {}",
+                    task.name, task.version
+                );
             }
 
             found_tasks.insert(task_with_version);

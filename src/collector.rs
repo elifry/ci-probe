@@ -1,13 +1,7 @@
 use anyhow::Result;
-use lazy_static::lazy_static;
-use regex::Regex;
 use std::path::PathBuf;
 
-use crate::find_pipeline_files;
-
-lazy_static! {
-    static ref TASK_REGEX: Regex = Regex::new(r#"task:\s*([\w/]+)@(\d+)"#).unwrap();
-}
+use crate::{find_pipeline_files, parse_task_definition};
 
 #[derive(Debug)]
 pub enum CollectedTask {
@@ -45,11 +39,10 @@ impl TaskImplementationCollector {
                 .collect();
 
             for line in lines {
-                if let Some(cap) = TASK_REGEX.captures(line) {
-                    let task_name = cap[1].to_string();
+                if let Some(task) = parse_task_definition(line) {
                     collected.push(CollectedTask::Regular {
-                        task_name,
-                        version: cap[2].to_string(),
+                        task_name: task.name,
+                        version: task.version,
                         file_path: pipeline_file.clone(),
                     });
                 }
