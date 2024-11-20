@@ -17,9 +17,19 @@ variables:
 
 jobs:
   - job: test
+    strategy:
+      matrix:
+        linux:
+          imageName: 'ubuntu-latest'
+        windows:
+          imageName: 'windows-latest'
+        macos:
+          imageName: 'macos-latest'
     displayName: Test
     pool:
-      vmImage: ubuntu-latest
+      vmImage: $(imageName)
     steps:
       - script: cargo test
         displayName: 'Run Tests'
+      - script: cargo build
+        displayName: 'Verify Build'
