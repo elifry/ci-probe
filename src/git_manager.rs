@@ -32,9 +32,7 @@ impl GitManager {
             let url_part = repo_url.trim_start_matches("https://").replace(" ", "%20");
             format!(
                 "https://{}:{}@{}",
-                credentials.username,
-                credentials.token,
-                url_part
+                credentials.username, credentials.token, url_part
             )
         };
 
