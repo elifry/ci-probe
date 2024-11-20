@@ -1,0 +1,39 @@
+trigger:
+  tags:
+    include:
+      - 'v*.*.*'
+pr: none
+
+jobs:
+  - job: build_and_release
+    strategy:
+      matrix:
+        linux:
+          imageName: 'ubuntu-latest'
+          artifactName: 'ciprobe'
+          assetName: 'ciprobe-linux-amd64'
+        windows:
+          imageName: 'windows-latest'
+          artifactName: 'ciprobe.exe'
+          assetName: 'ciprobe-windows-amd64.exe'
+        macos:
+          imageName: 'macos-latest'
+          artifactName: 'ciprobe'
+          assetName: 'ciprobe-macos-amd64'
+    displayName: Build and Release
+    pool:
+      vmImage: $(imageName)
+    steps:
+      - script: cargo build --release
+        displayName: 'Build Release'
+
+      - script: |
+          cd target/release
+          cp $(artifactName) $(assetName)
+        displayName: 'Rename binary'
+
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(System.DefaultWorkingDirectory)/target/release/$(assetName)'
+          artifactName: '$(assetName)'
+          publishLocation: 'pipeline'

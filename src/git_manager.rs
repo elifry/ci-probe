@@ -14,7 +14,13 @@ pub struct GitManager {
 
 impl GitManager {
     pub fn new(credentials: Credentials, repo_url: &str, verbose: bool) -> Result<Self> {
-        let repo_name = repo_url.split('/').last().unwrap_or("repo").to_string();
+        let repo_name = repo_url
+            .split('/')
+            .last()
+            .unwrap_or("repo")
+            .trim_end_matches("/_git/")
+            .trim_end_matches(".git")
+            .replace("%20", " ");
 
         let formatted_repo_url = if repo_url.contains("@") {
             let parts: Vec<&str> = repo_url.splitn(2, '@').collect();
@@ -23,11 +29,12 @@ impl GitManager {
                 credentials.username, credentials.token, parts[1]
             )
         } else {
+            let url_part = repo_url.trim_start_matches("https://").replace(" ", "%20");
             format!(
                 "https://{}:{}@{}",
                 credentials.username,
                 credentials.token,
-                repo_url.trim_start_matches("https://")
+                url_part
             )
         };
 
